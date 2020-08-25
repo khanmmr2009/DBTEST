@@ -1,0 +1,291 @@
+---Github
+
+---Create Table PLCS
+
+CREATE DATABASE [PLCS]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'PLCS', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL11.SQLEXPRESS\MSSQL\DATA\PLCS.mdf' , SIZE = 4096KB , FILEGROWTH = 1024KB )
+ LOG ON 
+( NAME = N'PLCS_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL11.SQLEXPRESS\MSSQL\DATA\PLCS_log.ldf' , SIZE = 1024KB , FILEGROWTH = 10%)
+GO
+ALTER DATABASE [PLCS] SET COMPATIBILITY_LEVEL = 110
+GO
+ALTER DATABASE [PLCS] SET ANSI_NULL_DEFAULT OFF 
+GO
+ALTER DATABASE [PLCS] SET ANSI_NULLS OFF 
+GO
+ALTER DATABASE [PLCS] SET ANSI_PADDING OFF 
+GO
+ALTER DATABASE [PLCS] SET ANSI_WARNINGS OFF 
+GO
+ALTER DATABASE [PLCS] SET ARITHABORT OFF 
+GO
+ALTER DATABASE [PLCS] SET AUTO_CLOSE OFF 
+GO
+ALTER DATABASE [PLCS] SET AUTO_CREATE_STATISTICS ON 
+GO
+ALTER DATABASE [PLCS] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [PLCS] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [PLCS] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [PLCS] SET CURSOR_DEFAULT  GLOBAL 
+GO
+ALTER DATABASE [PLCS] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+ALTER DATABASE [PLCS] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [PLCS] SET QUOTED_IDENTIFIER OFF 
+GO
+ALTER DATABASE [PLCS] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [PLCS] SET  DISABLE_BROKER 
+GO
+ALTER DATABASE [PLCS] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [PLCS] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [PLCS] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [PLCS] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+ALTER DATABASE [PLCS] SET  READ_WRITE 
+GO
+ALTER DATABASE [PLCS] SET RECOVERY SIMPLE 
+GO
+ALTER DATABASE [PLCS] SET  MULTI_USER 
+GO
+ALTER DATABASE [PLCS] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [PLCS] SET TARGET_RECOVERY_TIME = 0 SECONDS 
+GO
+USE [PLCS]
+GO
+IF NOT EXISTS (SELECT name FROM sys.filegroups WHERE is_default=1 AND name = N'PRIMARY') ALTER DATABASE [PLCS] MODIFY FILEGROUP [PRIMARY] DEFAULT
+GO
+
+--------------------------
+--Creating table “Book_Details”:
+
+CREATE TABLE Book_Details  
+(  
+ISBN_Code int PRIMARY KEY,  
+Book_Title varchar(100),  
+Language varchar(10),  
+Binding_Id int,  
+No_Copies_Actual int,  
+No_Copies_Current int,  
+Category_id int,  
+Publication_year int  
+
+----------------------------
+
+--Inserting Data in “Book_Details” :
+INSERT INTO dbo.Book_Details
+VALUES('0006','Programming Concept','English',2,20,15,2,2006); 
+
+-------------------------------------------
+
+--Creating table “Binding_Details”:
+CREATE TABLE Binding_details  
+(  
+    Binding_id int PRIMARY KEY,  
+    Binding_Name varchar(50)  
+)  
+------------------------------------
+--Describe Binding table:
+
+--Describe binding_details
+
+--Inserting data in Binding Table:
+INSERT INTO Binding_Details VALUES(1,'McGraw Hill');  
+INSERT INTO Binding_Details VALUES(2,'BPB Publication');  
+---------------------------------
+--All Data of Binding Table:
+select * from dbo.Binding_Details  
+----------------------------------
+
+--Creating Relationship Between Book and Binding Table:
+--ALTER TABLE Book_details  
+--ADD CONSTRAINT Binding_ID_FK FOREIGN KEY(Binding_Id) REFERENCES Binding_Details(Binding_Id);  
+
+--Checking Relationship:
+
+select b.Book_Title, e.binding_name  
+from Book_Details b, Binding_Details e  
+where b.binding_id = e.binding_id;  
+--------------------------------------
+--Creating Category Table:
+CREATE TABLE Category_Details  
+(  
+    Category_Id int PRIMARY KEY,  
+    Category_Name varchar(50)  
+)  
+------------------------------------
+--Inserting some data in Category Table:
+INSERT INTO CATEGORY_DETAILS VALUES(1,'Database');  
+INSERT INTO CATEGORY_DETAILS VALUES(2,'Programming Language'); 
+
+-------------------------------------------------------------
+--Building Relationship between Book & Category Table:
+ALTER TABLE Book_details  
+ADD CONSTRAINT Category_Id_FK FOREIGN KEY(Category_Id) REFERENCES Category_Details(Category_Id); 
+--------------------------------------
+
+--Checking Relationship:
+select b.Book_Title,e.Category_Name  
+from Book_Details b,Category_Details e  
+where b.binding_id = e.Category_id;  
+------------------------------------------
+
+--Creating Borrower Table:
+CREATE TABLE Borrower_Details  
+(  
+    Borrower_Id int PRIMARY KEY,  
+    Book_Id int,  
+    Borrowed_From date,  
+    Borrowed_TO date,  
+    Actual_Return_Date date,  
+    Issued_by int  
+)  
+------------------------------------------
+--Inserting Some data in Category Table:
+
+Insert into BORROWER_DETAILS VALUES(1,0004,'01-Aug-2014','7-Aug-2014','7-Aug-2014',1)  
+Insert into BORROWER_DETAILS VALUES(2,6,'02-Aug-2014','8-Aug-2014',NULL,1) 
+---------------------------------------------------
+
+
+
+Insert into BORROWER_DETAILS VALUES(1,0004,'01-Aug-2014','7-Aug-2014','7-Aug-2014',1)  
+Insert into BORROWER_DETAILS VALUES(2,6,'02-Aug-2014','8-Aug-2014',NULL,1) 
+ 
+--Building Relation Between Book & Borrower Table:
+
+ALTER TABLE Borrower_details 
+ADD CONSTRAINT Book_Id_FK FOREIGN KEY(Book_Id) REFERENCES Book_Details(ISBN_Code);
+-----------------------------------------------------
+
+--Checking Relationship:
+select Borrower_Details.Borrower_id,Book_Details.Book_title  
+from Borrower_Details,Book_Details  
+where Borrower_Details.book_id=Book_Details.ISBN_Code 
+---------------------------------------------------
+
+
+
+--Creating Staff Table :
+--CREATE TABLE Staff_Details  
+--(  
+--    Staff_Id int PRIMARY KEY,  
+--    Staff_Name varchar(50),  
+--    Password varchar(16),  
+--    Is_Adminbinary_float Varchar(20),  
+--    Designation varchar(20)  
+--)  
+--Inserting some data in Staff Table:
+--Insert into STAFF_DETAILS values (1,'Tarek Hossain','1234asd',0,'Lib_mgr');  
+--Insert into STAFF_DETAILS values (2,'Md.Kishor Morol','iloveyou',0,'Lib_clr');  
+--All Data of Staff table:
+--select * from Staff_details; 
+
+ALTER TABLE Borrower_Details  
+ADD CONSTRAINT Issued_by_FK FOREIGN KEY(Issued_by) REFERENCES Staff_Details(Staff_Id); 
+
+------------------------------------------
+
+Creating Student Table:
+Create TABLE Student_Details  
+(  
+    Student_Id varchar(10) PRIMARY KEY,  
+    Student_Name varchar(50),  
+    Sex Varchar(20),  
+    Date_Of_Birth date,  
+    Borrower_Id int,  
+    Department varchar(10),  
+    contact_Number varchar(11)  
+)  
+--Inserting Some Data in Student Table:
+Insert into STUDENT_DETAILS values ('13-23059-1','Ahmed,Ali','Male','05-Oct-1995',1,'CSSE','01681849871');  
+Insert into STUDENT_DETAILS values ('13-23301-1','MOrol MD.Kishor','Male','03-Jan-1994',2,'CSE','01723476554');  
+--All Data of Student Table:
+select * from student_details;  
+
+------------------------------------------------
+
+
+--Building Relationship between student and Borrower table:
+ALTER TABLE student_details  
+ADD CONSTRAINT borrower_id_FK FOREIGN KEY(Borrower_Id) REFERENCES Borrower_Details(Borrower_Id);  
+--Checking Full Relationship:
+select student.student_id, student.student_name, book.Book_Title, staff.staff_name, b.Borrowed_To  
+from student_Details student, Staff_Details staff, Borrower_Details b, book_details book  
+where student.Borrower_id = b.Borrower_id and book.ISBN_Code = b.book_id and b.Issued_by = staff.Staff_id; 
+
+-----------------------------------------------
+
+----Adding Shelf Table:
+--Create Table Shelf_Details  
+--(  
+--    Shelf_id int PRIMARY KEY,  
+--    Shelf_No int,  
+--    Floor_No int  
+--);  
+----Inserting Some Data from Shelf Table:
+--Insert into Shelf_Details Values(1, 1, 1);  
+--Insert into Shelf_Details Values(2, 2, 10001);  
+--Insert into Shelf_Details Values(3, 1, 10002);  
+--All Data In Shelf Table:
+select* from Shelf_Details;  
+--------------------------------------------
+
+--Adding Relationship Between Shelf and Book Table:
+ALTER TABLE Book_Details  
+ADD  Shelf_Id int;  
+  
+UPDATE Book_Details set Shelf_Id = 1  
+where ISBN_CODE = 4;  
+  
+UPDATE Book_Details set Shelf_Id = 2  
+where ISBN_CODE = 6;  
+  
+ALTER TABLE Book_Details  
+ADD CONSTRAINT Shelf_Id_FK FOREIGN KEY(Shelf_Id) REFERENCES Shelf_Details(Shelf_Id);  
+--Combined all Relationship:
+select student.student_id, student.student_name, book.Book_Title, staff.staff_name, b.Borrowed_To, shelf.shelf_No  
+from student_Details student, Staff_Details staff, Borrower_Details b, book_details book, Shelf_Details shelf  
+where student.Borrower_id = b.Borrower_id and book.ISBN_Code = b.book_id and b.Issued_by = staff.Staff_id and book.Shelf_Id = shelf.Shelf_Id;  
+
+-----------------------------------------------------------
+
+
+CREATE PROCEDURE Top5BorrowedAuthor
+AS
+SET NOCOUNT ON;
+
+
+SELECT TOP 5 Author_Name
+FROM dbo.Book_Details;
+GO
+
+USE [PLCS]
+GO
+/****** Object:  StoredProcedure [dbo].[Top5BorrowedAuthor]    Script Date: 8/25/2020 5:10:43 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[Top5BorrowedAuthor]
+AS
+SET NOCOUNT ON;
+
+
+SELECT TOP 5 Author_Name
+FROM dbo.Book_Details;
+-----------------------------------------------
+
+ 
+
